@@ -26,9 +26,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	typedef struct {
 		daisy::DaisySeed seed;
 
-		void Init() {
+		void Init(bool boost) {
 			seed.Configure();
-			seed.Init();
+			seed.Init(boost);
 		}
 	} Daisy;
 #endif
