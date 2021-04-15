@@ -81,7 +81,13 @@ function checkBuildEnvironment() {
 			console.warn(`oopsy can't find the ARM GCC build tools, will not be able to upload binary to the Daisy. Please check https://github.com/electro-smith/DaisyWiki/wiki/1e.-Getting-Started-With-Oopsy-(Gen~-Integration) for installation instructions.`)
 			process.exit(-1);
 		}
-		
+	} else if (os.platform() === "linux") {
+		let build_tools_path = require("child_process").execSync("which arm-none-eabi-gcc").toString();
+		if (!build_tools_path) {
+			console.log("oopsy can't find an ARM-GCC toolchain. Please check https://github.com/electro-smith/DaisyWiki/wiki/1e.-Getting-Started-With-Oopsy-(Gen~-Integration) for installation instructions.")
+			process.exit(-1);
+		}
+
 	} else {
 		// OSX:
 		let locations = ["/opt/homebrew/bin", "/usr/local/bin"]
