@@ -1,0 +1,86 @@
+{
+    "max_apps":8,
+	  "defines": {
+      "OOPSY_TARGET_CUSTOM": 1,
+      "OOPSY_IO_COUNT": 2,
+      "OOPSY_TARGET_HAS_MIDI_INPUT": 1,
+      "OOPSY_TARGET_USES_SDMMC": 1,
+
+      "OOPSY_ANALOG_CONTROL_COUNT": 4,
+      "PIN_CONTROL_1": 16,
+      "PIN_CONTROL_2": 15,
+      "PIN_CONTROL_3": 21,
+      "PIN_CONTROL_4": 18,
+
+      "OOPSY_HAS_ENCODER": 1,
+      "PIN_ENC_CLICK": 28,
+      "PIN_ENC_B": 26,
+      "PIN_ENC_A": 27,
+
+      "OOPSY_TARGET_HAS_OLED": 1,
+      "OLED_WIDTH": 64,
+      "OLED_HEIGHT": 32,
+      "OOPSY_HAS_PARAM_VIEW": 1
+    },
+    "inserts": {
+      "init": [
+        "daisy::DaisySeed seed = daisy.hardware.seed;",
+        "// ADC initialization...",
+        "daisy::AdcChannelConfig cfg[4];",
+        "cfg[0].InitSingle(seed.GetPin(PIN_CONTROL_1));",
+        "cfg[1].InitSingle(seed.GetPin(PIN_CONTROL_2));",
+        "cfg[2].InitSingle(seed.GetPin(PIN_CONTROL_3));",
+        "cfg[3].InitSingle(seed.GetPin(PIN_CONTROL_4));",
+        "seed.adc.Init(cfg, 4);",
+        "// Control initialization...",
+        "daisy.hardware.controls[0].Init(seed.adc.GetPtr(0), seed.AudioCallbackRate(), false);",
+        "daisy.hardware.controls[1].Init(seed.adc.GetPtr(1), seed.AudioCallbackRate(), false);",
+        "daisy.hardware.controls[2].Init(seed.adc.GetPtr(2), seed.AudioCallbackRate(), true);",
+        "daisy.hardware.controls[3].Init(seed.adc.GetPtr(3), seed.AudioCallbackRate(), true);",
+        "// Encoder initialization...",
+        "daisy.hardware.encoder.Init(seed.GetPin(PIN_ENC_A), seed.GetPin(PIN_ENC_B), seed.GetPin(PIN_ENC_CLICK), seed.AudioCallbackRate());"
+      ],
+      "audio": [
+        "daisy.hardware.encoder.Debounce();"
+      ]
+    },
+    "labels": {
+      "params": {
+        "kn1": "kn1",
+        "kn2": "kn2",
+        "cv1": "cv1",
+        "cv2": "cv2"
+      },
+      "outs": {
+      },
+      "datas": {
+      }
+    },
+    "inputs": {
+      "kn1": {
+        "automap": true,
+        "code": "daisy.hardware.controls[0].Process();"
+      },
+      "kn2": {
+        "automap": true,
+        "code": "daisy.hardware.controls[1].Process();"
+      },
+      "cv1": {
+        "automap": true,
+        "code": "daisy.hardware.controls[0].Process();"
+      },
+      "cv2": {
+        "automap": true,
+        "code": "daisy.hardware.controls[1].Process();"
+      }
+    },
+    "outputs": {
+    },   
+    "datahandlers": {
+      "dsy_midi_out": {
+        "where":"main",
+        "init": "daisy.midi_nullData($<data>)",
+        "code": "daisy.midi_fromData($<data>);"
+      }
+    }
+}

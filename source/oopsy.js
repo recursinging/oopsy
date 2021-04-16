@@ -380,7 +380,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	For details of the licensing terms of code exported from gen~ see https://support.cycling74.com/hc/en-us/articles/360050779193-Gen-Code-Export-Licensing-FAQ
 */
 
-${hardware.inserts.filter(o => o.where == "header").map(o => o.code).join("\n")}
+${Object.keys(hardware.defines).map(k=>`#define ${k} ${hardware.defines[k]}`).join("\n")}
+
+${(hardware.inserts.header || []).join("\n")}
 #include "../genlib_daisy.h"
 #include "../genlib_daisy.cpp"
 
@@ -400,7 +402,7 @@ int main(void) {
 	oopsy::daisy.hardware.Init(${options.boost|false}); 
 	oopsy::daisy.hardware.seed.SetAudioSampleRate(daisy::SaiHandle::Config::SampleRate::SAI_${samplerate}KHZ);
 	oopsy::daisy.hardware.seed.SetAudioBlockSize(OOPSY_BLOCK_SIZE);
-	${hardware.inserts.filter(o => o.where == "init").map(o => o.code).join("\n\t")}
+	${(hardware.inserts.main ||  []).join("\n\t")}
 	// insert custom hardware initialization here
 	return oopsy::daisy.run(appdefs, ${apps.length});
 }
@@ -732,7 +734,15 @@ function generate_app(app, hardware, target, config) {
 	app.daisy = daisy;
 	app.gen = gen;
 	app.nodes = nodes;
-	app.inserts = [];
+	app.inserts = {
+		init: [],
+		audio: [],
+		post_audio: [],
+		display: [],
+		main:[]
+	};
+	// map the hardware insert definition to the app insert definition
+	Object.keys(hardware.inserts || {}).forEach(k => app.inserts[k] = hardware.inserts[k] || []);
 
 	gen.audio_ins = app.patch.ins.map((s, i)=>{
 		let name = "gen_in"+(i+1)
@@ -1085,10 +1095,7 @@ function generate_app(app, hardware, target, config) {
 					${node.varname} = 1.f;
 				}`;
 			// reset:
-			app.inserts.push({
-				where: "post_audio",
-				code: `${node.varname} = 0.f;`
-			})
+			app.inserts.post_audio.push(`${node.varname} = 0.f;`);
 		} else if (param.name == "midi_play") {
 			app.has_midi_in = true;
 			node.where = "midi_status"
@@ -1100,10 +1107,7 @@ function generate_app(app, hardware, target, config) {
 					${node.varname} = 0.f;
 				}`;
 			// reset:
-			app.inserts.push({
-				where: "post_audio",
-				code: `${node.varname} = 0.f;`
-			})
+			app.inserts.post_audio.push(`${node.varname} = 0.f;`);
 		} else {
 			// search for a matching [out] name / prefix:
 			Object.keys(hardware.labels.params).sort().forEach(k => {
@@ -1256,6 +1260,9 @@ struct App_${name} : public oopsy::App<App_${name}> {
 	float ${name}[OOPSY_BLOCK_SIZE];`).join("")}
 	
 	void init(oopsy::GenDaisy& daisy) {
+		
+		${app.inserts.init.join("\n\t\t")}
+		
 		daisy.gen = ${name}::create(daisy.hardware.seed.AudioSampleRate(), daisy.hardware.seed.AudioBlockSize());
 		${name}::State& gen = *(${name}::State *)daisy.gen;
 		
@@ -1282,7 +1289,9 @@ struct App_${name} : public oopsy::App<App_${name}> {
 	void audioCallback(oopsy::GenDaisy& daisy, float **hardware_ins, float **hardware_outs, size_t size) {
 		Daisy& hardware = daisy.hardware;
 		${name}::State& gen = *(${name}::State *)daisy.gen;
-		${app.inserts.concat(hardware.inserts).filter(o => o.where == "audio").map(o => o.code).join("\n\t")}
+		
+		${app.inserts.audio.join("\n\t")}
+		
 		${daisy.device_inputs.map(name => nodes[name])
 			.filter(node => node.to.length)
 			.filter(node => node.update && node.update.where == "audio")
@@ -1366,13 +1375,13 @@ struct App_${name} : public oopsy::App<App_${name}> {
 			.map(node=>node.src ? `
 		memcpy(${node.name}, ${node.src}, sizeof(float)*size);` : `
 		memset(${node.name}, 0, sizeof(float)*size);`).join("")}
-		${app.inserts.concat(hardware.inserts).filter(o => o.where == "post_audio").map(o => o.code).join("\n\t")}
+		${app.inserts.post_audio.join("\n\t")}
 	}	
 
 	void mainloopCallback(oopsy::GenDaisy& daisy, uint32_t t, uint32_t dt) {
 		Daisy& hardware = daisy.hardware;
 		${name}::State& gen = *(${name}::State *)daisy.gen;
-		${app.inserts.concat(hardware.inserts).filter(o => o.where == "main").map(o => o.code).join("\n\t")}
+		${app.inserts.main.join("\n\t")}
 		${daisy.datahandlers.map(name => nodes[name])
 			.filter(node => node.where == "main")
 			.filter(node => node.data)
@@ -1427,7 +1436,7 @@ struct App_${name} : public oopsy::App<App_${name}> {
 	void displayCallback(oopsy::GenDaisy& daisy, uint32_t t, uint32_t dt) {
 		Daisy& hardware = daisy.hardware;
 		${name}::State& gen = *(${name}::State *)daisy.gen;
-		${app.inserts.concat(hardware.inserts).filter(o => o.where == "display").map(o => o.code).join("\n\t")}
+		${app.inserts.display.join("\n\t")}
 		${daisy.datahandlers.map(name => nodes[name])
 			.filter(node => node.where == "display")
 			.filter(node => node.data)

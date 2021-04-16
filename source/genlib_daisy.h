@@ -33,6 +33,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	} Daisy;
 #endif
 
+
 #ifdef OOPSY_USE_USB_SERIAL_INPUT
 static char   sumbuff[1024];
 static uint32_t  rx_size = 0;
