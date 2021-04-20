@@ -402,8 +402,10 @@ int main(void) {
 	oopsy::daisy.hardware.Init(${options.boost|false}); 
 	oopsy::daisy.hardware.seed.SetAudioSampleRate(daisy::SaiHandle::Config::SampleRate::SAI_${samplerate}KHZ);
 	oopsy::daisy.hardware.seed.SetAudioBlockSize(OOPSY_BLOCK_SIZE);
+
 	${(hardware.inserts.main ||  []).join("\n\t")}
 	// insert custom hardware initialization here
+
 	return oopsy::daisy.run(appdefs, ${apps.length});
 }
 `
@@ -1381,7 +1383,7 @@ struct App_${name} : public oopsy::App<App_${name}> {
 	void mainloopCallback(oopsy::GenDaisy& daisy, uint32_t t, uint32_t dt) {
 		Daisy& hardware = daisy.hardware;
 		${name}::State& gen = *(${name}::State *)daisy.gen;
-		${app.inserts.main.join("\n\t")}
+		${app.inserts.audio.join("\n\t")}
 		${daisy.datahandlers.map(name => nodes[name])
 			.filter(node => node.where == "main")
 			.filter(node => node.data)

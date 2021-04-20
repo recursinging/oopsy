@@ -23,8 +23,8 @@
       "OOPSY_HAS_PARAM_VIEW": 1
     },
     "inserts": {
-      "init": [
-        "daisy::DaisySeed seed = daisy.hardware.seed;",
+      "main": [
+        "daisy::DaisySeed seed = oopsy::daisy.hardware.seed;",
         "// ADC initialization...",
         "daisy::AdcChannelConfig cfg[4];",
         "cfg[0].InitSingle(seed.GetPin(PIN_CONTROL_1));",
@@ -33,12 +33,13 @@
         "cfg[3].InitSingle(seed.GetPin(PIN_CONTROL_4));",
         "seed.adc.Init(cfg, 4);",
         "// Control initialization...",
-        "daisy.hardware.controls[0].Init(seed.adc.GetPtr(0), seed.AudioCallbackRate(), false);",
-        "daisy.hardware.controls[1].Init(seed.adc.GetPtr(1), seed.AudioCallbackRate(), false);",
-        "daisy.hardware.controls[2].Init(seed.adc.GetPtr(2), seed.AudioCallbackRate(), true);",
-        "daisy.hardware.controls[3].Init(seed.adc.GetPtr(3), seed.AudioCallbackRate(), true);",
+        "oopsy::daisy.hardware.controls[0].Init(seed.adc.GetPtr(0), seed.AudioCallbackRate(), false);",
+        "oopsy::daisy.hardware.controls[1].Init(seed.adc.GetPtr(1), seed.AudioCallbackRate(), false);",
+        "oopsy::daisy.hardware.controls[2].Init(seed.adc.GetPtr(2), seed.AudioCallbackRate(), true);",
+        "oopsy::daisy.hardware.controls[3].Init(seed.adc.GetPtr(3), seed.AudioCallbackRate(), true);",
         "// Encoder initialization...",
-        "daisy.hardware.encoder.Init(seed.GetPin(PIN_ENC_A), seed.GetPin(PIN_ENC_B), seed.GetPin(PIN_ENC_CLICK), seed.AudioCallbackRate());"
+        "oopsy::daisy.hardware.encoder.Init(seed.GetPin(PIN_ENC_A), seed.GetPin(PIN_ENC_B), seed.GetPin(PIN_ENC_CLICK), seed.AudioCallbackRate());",
+        "oopsy::daisy.hardware.display.Init(NULL);"
       ],
       "audio": [
         "daisy.hardware.encoder.Debounce();"
