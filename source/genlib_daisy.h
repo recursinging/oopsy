@@ -38,6 +38,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 static char   sumbuff[1024];
 static uint32_t  rx_size = 0;
 static bool      update = false;
+
 #endif
 
 ////////////////////////// DAISY EXPORT INTERFACING //////////////////////////
@@ -873,7 +874,7 @@ namespace oopsy {
 			// menu_button_incr += hardware.GetKnobValue(6) * app_count;
 			// menu_button_held_ms = hardware.tap.TimeHeldMs();
 			// if (hardware.tap_.FallingEdge()) menu_button_released = 1;
-			#elif defined(OOPSY_TARGET_POD) || defined(OOPSY_TARGET_PETAL) || defined(OOPSY_TARGET_PATCH)
+			#elif defined(OOPSY_TARGET_POD) || defined(OOPSY_TARGET_PETAL) || defined(OOPSY_TARGET_PATCH) || defined(OOPSY_TARGET_CUSTOM)
             hardware.ProcessAllControls();
 			menu_button_held = hardware.encoder.Pressed();
 			menu_button_incr += hardware.encoder.Increment();
