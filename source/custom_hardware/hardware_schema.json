@@ -1,0 +1,538 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/HardwareDescription",
+    "definitions": {
+        "HardwareDescription": {
+            "type": "object",
+            "title": "Oopsy Hardware Description",
+            "additionalProperties": false,
+            "properties": {
+                "schema_version": {
+                    "type": "integer",
+                    "title": "The version of this schema",
+                    "default": 1
+                },
+                "name": {
+                    "type": "string",
+                    "title": "The name of the hardware being described here"
+                },
+                "description": {
+                    "type": "string",
+                    "title": "A short description of the hardware being described here"
+                },
+                "analog_controls": {
+                    "type": "array",
+                    "title": "analog_controls - Analog control configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/AnalogControl"
+                    }
+                },
+                "cv_inputs": {
+                    "type": "array",
+                    "title": "cv_inputs - CV input configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/AnalogControl"
+                    }
+                },
+                "cv_outputs": {
+                    "type": "array",
+                    "title": "cv_outputs - CV output configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/CvOutput"
+                    }
+                },
+                "encoders": {
+                    "type": "array",
+                    "title": "encoders - Rotary encoder configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/Encoder"
+                    }
+                },
+                "switches": {
+                    "type": "array",
+                    "title": "switches - Switch configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/Switch"
+                    }
+                },
+                "leds": {
+                    "type": "array",
+                    "title": "leds - LED configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/LED"
+                    }
+                },
+                "rgb_leds": {
+                    "type": "array",
+                    "title": "rgb_leds - RGB LED configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/RGBLED"
+                    }
+                },
+                "oled_displays": {
+                    "type": "array",
+                    "title": "oled_displays - OLED Display configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/OLEDDisplay"
+                    }
+                },
+                "gate_inputs": {
+                    "type": "array",
+                    "title": "gate_inputs - Gate input configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/GateInput"
+                    }
+                },
+                "gate_outputs": {
+                    "type": "array",
+                    "title": "gate_outputs - Gate output configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/GateOutput"
+                    }
+                },
+                "midi_handlers": {
+                    "type": "array",
+                    "title": "midi_handlers - MIDI handler configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/MIDIHandler"
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "schema_version"
+            ]
+        },
+        "AnalogControl": {
+            "type": "object",
+            "title": "AnalogControl",
+            "description": "Hardware Interface for control inputs primarily designed for ADC input controls such as potentiometers and CV inputs.",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "flip": {
+                    "type": "boolean",
+                    "title": "Flip",
+                    "description": "determines whether the input is flipped (i.e. 1.f - input) or not before being processed."
+                },
+                "invert": {
+                    "type": "boolean",
+                    "title": "Invert",
+                    "description": "determines whether the input is inverted (i.e. -1.f * input) or note before being processed."
+                },
+                "bipolar": {
+                    "type": "boolean",
+                    "title": "Bipolar",
+                    "description": " Initializes the AnalogControl for a -5V to 5V inverted input. All of the Init details are the same otherwise"
+                },
+                "voltage_range": {
+                    "$ref": "#/definitions/VoltageRange"
+                },
+                "calibration": {
+                    "$ref": "#/definitions/CvCalibration"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin"
+            ]
+        },
+        "CvOutput": {
+            "type": "object",
+            "title": "CV Output",
+            "description": "Configuration for a CV output",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "voltage_range": {
+                    "$ref": "#/definitions/VoltageRange"
+                },
+                "calibration": {
+                    "$ref": "#/definitions/CvCalibration"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin",
+                "voltage_range"
+            ]
+        },
+        "CvCalibration": {
+            "type": "array",
+            "title": "Calibration",
+            "description": "A list of offsets at different voltage levels throughout a voltage range",
+            "items": {
+                "$ref": "#/definitions/CvOffset"
+            }
+        },
+        "CvOffset": {
+            "type": "object",
+            "title": "CV Offset",
+            "description": "An offset to be added to/subtracted from a measured voltage",
+            "additionalProperties": false,
+            "properties": {
+                "voltage": {
+                    "title": "Voltage",
+                    "description": "The target voltage",
+                    "type": "number"
+                },
+                "offset": {
+                    "title": "Offset",
+                    "description": "The number of volts to add or subtract from the measured voltage to reach the target voltage",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "offset",
+                "voltage"
+            ]
+        },
+        "Encoder": {
+            "type": "object",
+            "title": "Encoder",
+            "description": "Configuration for a rotary encoder",
+            "additionalProperties": false,
+            "properties": {
+                "pin_a": {
+                    "title": "Encoder A Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_b": {
+                    "title": "Encoder B Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_switch": {
+                    "title": "Encoder Switch Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin_a",
+                "pin_b"
+            ]
+        },
+        "GateInput": {
+            "type": "object",
+            "title": "Gate Input",
+            "description": "Configuration for a gate input",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin"
+            ]
+        },
+        "GateOutput": {
+            "type": "object",
+            "title": "Gate Output",
+            "description": "Configuration for a gate output",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin"
+            ]
+        },
+        "GPIOPin": {
+            "type": "integer",
+            "title": "GPIO pin number (0-30)",
+            "minimum": 0,
+            "maximum": 30
+        },
+        "Labels": {
+            "type": "array",
+            "title": "Labels",
+            "description": "A list of aliases for referring to this object",
+            "items": {
+                "type": "string"
+            }
+        },
+        "LED": {
+            "type": "object",
+            "title": "LED",
+            "description": "Configuration for an LED",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "invert": {
+                    "type": "boolean",
+                    "title": "Invert",
+                    "description": "True to internally invert the brightness due to hardware config."
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin"
+            ]
+        },
+        "MIDIHandler": {
+            "type": "object",
+            "title": "MIDI Handler",
+            "description": "Configuration for a MIDI handler",
+            "additionalProperties": false,
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "title": "Input Mode",
+                    "enum": [
+                        "UART1",
+                        "USB_INT",
+                        "USB_EXT",
+                        "NONE"
+                    ]
+                },
+                "output": {
+                    "type": "string",
+                    "title": "Output Mode",
+                    "enum": [
+                        "UART1",
+                        "USB_INT",
+                        "USB_EXT",
+                        "NONE"
+                    ]
+                }
+            },
+            "required": [
+                "input",
+                "output"
+            ]
+        },
+        "OLEDDisplay": {
+            "type": "object",
+            "title": "OLED Display",
+            "description": "Configuration for an OLED Display",
+            "additionalProperties": false,
+            "properties": {
+                "driver": {
+                    "type": "string",
+                    "enum": [
+                        "SSD130x"
+                    ],
+                    "default": "SSD130x"
+                },
+                "dimensions": {
+                    "type": "string",
+                    "enum": [
+                        "128x64",
+                        "128x32",
+                        "98x16",
+                        "64x48",
+                        "64x32"
+                    ],
+                    "default": "128x64"
+                },
+                "transport": {
+                    "type": "string",
+                    "enum": [
+                        "I2C",
+                        "4WireSPI"
+                    ],
+                    "default": "4WireSPI"
+                },
+                "i2c_config": {
+                    "$ref": "#/definitions/I2CConfig"
+                },
+                "4_wire_spi_config": {
+                    "$ref": "#/definitions/OLED4WireSPIConfig"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "dimensions",
+                "driver",
+                "transport"
+            ]
+        },
+        "OLED4WireSPIConfig": {
+            "type": "object",
+            "title": "4 Wire SPI Configuration for OLED Displays",
+            "additionalProperties": false,
+            "properties": {
+                "pin_dc": {
+                    "title": "OLED DC Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_reset": {
+                    "title": "OLED Reset Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                }
+            },
+            "required": [
+                "pin_dc",
+                "pin_reset"
+            ]
+        },
+        "I2CConfig": {
+            "type": "object",
+            "title": "I2C Configuration",
+            "additionalProperties": false,
+            "properties": {
+                "mode": {
+                    "type": "string",
+                    "enum": [
+                        "I2C_MASTER",
+                        "I2C_SLAVE"
+                    ],
+                    "default": "I2C_MASTER"
+                },
+                "peripheral": {
+                    "type": "string",
+                    "enum": [
+                        "I2C_1",
+                        "I2C_4"
+                    ],
+                    "default": "I2C_1"
+                },
+                "speed": {
+                    "type": "string",
+                    "enum": [
+                        "I2C_100KHZ",
+                        "I2C_400KHZ",
+                        "I2C_1MHZ"
+                    ],
+                    "default": "I2C_400KHZ"
+                },
+                "pin_sda": {
+                    "title": "I2C SDA Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_scl": {
+                    "title": "I2C SCL Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                }
+            },
+            "required": [
+                "mode",
+                "peripheral",
+                "pin_scl",
+                "pin_sda",
+                "speed"
+            ]
+        },
+        "RGBLED": {
+            "type": "object",
+            "title": "RGB LED",
+            "description": "3x LEDs configured as an RGB for ease of use.",
+            "additionalProperties": false,
+            "properties": {
+                "pin_r": {
+                    "title": "Red LED Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_g": {
+                    "title": "Green LED Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "pin_b": {
+                    "title": "Blue LED Pin",
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "invert": {
+                    "type": "boolean",
+                    "title": "Invert",
+                    "description": "True to internally invert the brightness due to hardware config."
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin_b",
+                "pin_g",
+                "pin_r"
+            ]
+        },
+        "Switch": {
+            "type": "object",
+            "description": "Configuration for momentary/latching switches",
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "$ref": "#/definitions/GPIOPin"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "TYPE_TOGGLE",
+                        "TYPE_MOMENTARY"
+                    ],
+                    "default": "TYPE_TOGGLE"
+                },
+                "polarity": {
+                    "type": "string",
+                    "enum": [
+                        "POLARITY_NORMAL",
+                        "POLARITY_INVERTED"
+                    ],
+                    "default": "POLARITY_NORMAL"
+                },
+                "pull": {
+                    "type": "string",
+                    "enum": [
+                        "PULL_UP",
+                        "PULL_DOWN",
+                        "PULL_NONE"
+                    ],
+                    "default": "PULL_NONE"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "pin",
+                "polarity",
+                "pull",
+                "type"
+            ],
+            "title": "Switch"
+        },
+        "VoltageRange": {
+            "type": "object",
+            "title": "Voltage Range",
+            "description": "Describes the voltage range this hardware element is capable of handling",
+            "additionalProperties": false,
+            "properties": {
+                "min": {
+                    "type": "integer"
+                },
+                "max": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "min",
+                "max"
+            ]
+        }
+    }
+}

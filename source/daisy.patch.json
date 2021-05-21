@@ -1,4 +1,118 @@
 {
+    "custom_hardware": {
+      "schema_version": 1,
+      "analog_controls": [
+        {
+          "pin": 1,
+          "labels": [
+            "knob1"
+          ]
+        },
+        {
+          "pin": 2,
+          "labels": [
+            "knob2"
+          ]
+        }
+      ],
+      "cv_inputs": [
+        {
+          "voltage_range": {
+            "min": -5,
+            "max": 5
+          },
+          "pin": 3,
+          "bipolar": true,
+          "calibration": [
+            {
+              "voltage": -5,
+              "offset": 0.012
+            },
+            {
+              "voltage": -2.5,
+              "offset": 0.021
+            },
+            {
+              "voltage": 0,
+              "offset": -1.005
+            },
+            {
+              "voltage": 2.5,
+              "offset": -0.014
+            },
+            {
+              "voltage": 5,
+              "offset": -3.087
+            }
+          ],
+          "labels": [
+            "cv1"
+          ]
+        }
+      ],
+      "cv_outputs": [],
+      "encoders": [
+        {
+          "pin_a": 5,
+          "pin_b": 6,
+          "pin_switch": 7,
+          "labels": [
+            "encoder"
+          ]
+        }
+      ],
+      "switches": [
+        {
+          "type": "TYPE_TOGGLE",
+          "polarity": "POLARITY_NORMAL",
+          "pull": "PULL_NONE",
+          "pin": 4,
+          "labels": [
+            "switch1",
+            "sw1"
+          ]
+        }
+      ],
+      "leds": [
+        {
+          "pin": 9,
+          "labels": [
+            "led1"
+          ]
+        }
+      ],
+      "rgb_leds": [
+        {
+          "pin_r": 9,
+          "pin_g": 2,
+          "pin_b": 6,
+          "labels": [
+            "rgbled1"
+          ]
+        }
+      ],
+      "oled_displays": [
+        {
+          "driver": "SSD130x",
+          "dimensions": "64x32",
+          "transport": "I2C",
+          "i2c_config": {
+            "mode": "I2C_MASTER",
+            "peripheral": "I2C_1",
+            "speed": "I2C_400KHZ",
+            "pin_sda": 12,
+            "pin_scl": 13
+          },
+          "labels": [
+            "display"
+          ]
+        }
+      ],
+      "gate_inputs": [],
+      "name": "Foo",
+      "description": "Bar"
+    },
+  
     "max_apps":8,
 	  "defines": {
       "OOPSY_TARGET_PATCH": 1,

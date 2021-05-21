@@ -36,7 +36,8 @@
 const fs = require("fs"),
 	path = require("path"),
 	os = require("os"),
-	assert = require("assert");
+	assert = require("assert"),
+	custom_hardware = require("./custom_hardware");
 const {exec, execSync, spawn} = require("child_process");
 
 // returns the path `str` with posix path formatting:
@@ -382,7 +383,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ${Object.keys(hardware.defines).map(k=>`#define ${k} ${hardware.defines[k]}`).join("\n")}
 
+
+${custom_hardware.generateCustomHardwareImpl(hardware.custom_hardware)}
+
 ${(hardware.inserts.header || []).join("\n")}
+
+
 #include "../genlib_daisy.h"
 #include "../genlib_daisy.cpp"
 
