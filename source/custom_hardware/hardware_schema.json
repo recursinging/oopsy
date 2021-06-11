@@ -351,10 +351,10 @@
                 "transport": {
                     "type": "string",
                     "enum": [
-                        "I2C",
-                        "4WireSPI"
+                        "I2c",
+                        "4WireSpi"
                     ],
-                    "default": "4WireSPI"
+                    "default": "4WireSpi"
                 },
                 "i2c_config": {
                     "$ref": "#/definitions/I2CConfig"
@@ -396,6 +396,10 @@
             "title": "I2C Configuration",
             "additionalProperties": false,
             "properties": {
+                "address": {
+                    "type": "string",
+                    "default": "0x3C"
+                },
                 "mode": {
                     "type": "string",
                     "enum": [
@@ -431,6 +435,7 @@
                 }
             },
             "required": [
+                "address",
                 "mode",
                 "peripheral",
                 "pin_scl",
