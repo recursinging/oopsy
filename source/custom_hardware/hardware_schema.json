@@ -37,6 +37,8 @@
                 "cv_outputs": {
                     "type": "array",
                     "title": "cv_outputs - CV output configurations for this hardware",
+                    "maxItems": 2,
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "#/definitions/CvOutput"
                     }
@@ -147,9 +149,6 @@
             "description": "Configuration for a CV output",
             "additionalProperties": false,
             "properties": {
-                "pin": {
-                    "$ref": "#/definitions/GPIOPin"
-                },
                 "voltage_range": {
                     "$ref": "#/definitions/VoltageRange"
                 },
@@ -159,11 +158,7 @@
                 "labels": {
                     "$ref": "#/definitions/Labels"
                 }
-            },
-            "required": [
-                "pin",
-                "voltage_range"
-            ]
+            }
         },
         "CvCalibration": {
             "type": "array",
