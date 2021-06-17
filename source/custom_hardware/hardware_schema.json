@@ -98,6 +98,50 @@
                     "items": {
                         "$ref": "#/definitions/MIDIHandler"
                     }
+                },
+                "sdmmc_handlers": {
+                    "type": "array",
+                    "maxItems": 1,
+                    "title": "sdmmc_handlers - SD/MMC card handler configurations for this hardware",
+                    "items": {
+                        "$ref": "#/definitions/SDMMCHandler"
+                    }
+                },
+                "code_inserts": {
+                    "type": "object",
+                    "title": "code_inserts - Insert C++ code at specific locations in the generated hardware implementation",
+                    "properties": {
+                        "include": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "declaration": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "initialization": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "processing": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "updating": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             },
             "required": [
@@ -470,6 +514,48 @@
                 "pin_g",
                 "pin_r"
             ]
+        },
+        "SDMMCHandler": {
+            "type": "object",
+            "description": "Configuration for SD/MMC Card interfaces",
+            "additionalProperties": false,
+            "properties": {
+                "speed": {
+                    "type": "string",
+                    "description": "Sets the desired clock speed of the SD card bus. Initialization is always done at or below 400kHz, and then the user speed is set.",
+                    "enum": [
+                        "SLOW",
+                        "MEDIUM_SLOW",
+                        "STANDARD",
+                        "FAST",
+                        "VERY_FAST"
+                    ],
+                    "default": "FAST"
+                },
+                "width": {
+                    "type": "string",
+                    "description": "Sets whether 4-bit mode or 1-bit mode is used for the SDMMC",
+                    "enum": [
+                        "BITS_1",
+                        "BITS_4"
+                    ],
+                    "default": "BITS_4"
+                },
+                "clock_powersave": {
+                    "type": "boolean",
+                    "description": "When true, the clock will stop between transfers to save power.",
+                    "default": "false"
+                },
+                "labels": {
+                    "$ref": "#/definitions/Labels"
+                }
+            },
+            "required": [
+                "speed",
+                "width",
+                "clock_powersave"
+            ],
+            "title": "SDMMC Handler"
         },
         "Switch": {
             "type": "object",

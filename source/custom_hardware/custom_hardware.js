@@ -5,7 +5,8 @@ const Context = Object.freeze({
   INCLUDE: Symbol("INCLUDE"),
   DECLARATION: Symbol("DECLARATION"),
   INITIALIZATION: Symbol("INITIALIZATION"),
-  PROCESSING: Symbol("PROCESSING")
+  PROCESSING: Symbol("PROCESSING"),
+  UPDATING: Symbol("UPDATING")
 });
 
 /**
@@ -402,8 +403,31 @@ function generateGateOutputs(gate_outputs, context) {
 }
 
 
-function generateMidiHandlers(gate_outputs, context) {
+function generateMidiHandlers(midi_handlers, context) {
   return "";
+}
+
+function generateSdmmcHandlers(sdmmc_handlers, context) {
+  return "";
+}
+
+function generateCodeInserts(code_inserts, context) {
+  if (!code_inserts)
+    return "";
+
+  if (context == Context.INCLUDE && code_inserts.include) {
+    return code_inserts.include.join("/n");
+  } else if (context == Context.DECLARATION && code_inserts.declaration) {
+    return code_inserts.declaration.join("/n    ");
+  } else if (context == Context.INITIALIZATION && code_inserts.initialization) {
+    return code_inserts.initialization.join("/n        ");
+  } else if (context == Context.PROCESSING && code_inserts.processing) {
+    return code_inserts.initialization.join("/n        ");
+  } else if (context == Context.UPDATING && code_inserts.updating) {
+    return code_inserts.initialization.join("/n        ");
+  }
+
+  return ""
 }
 
 /**
@@ -418,6 +442,8 @@ exports.generateCustomHardwareImpl = function (hardware_description) {
 
 #include "daisy_seed.h"
 ${generateOledDisplays(hardware_description.oled_displays, Context.INCLUDE)}
+
+${generateCodeInserts(hardware_description.code_inserts, Context.INCLUDE)}
 
 using namespace daisy;
 
@@ -444,6 +470,8 @@ typedef struct {
 
     ${generateSwitches(hardware_description.switches, Context.DECLARATION)}
 
+    ${generateCodeInserts(hardware_description.code_inserts, Context.DECLARATION)}
+
     void Init(bool boost) 
     {
         seed.Configure();
@@ -468,6 +496,8 @@ typedef struct {
         ${generateRgbLeds(hardware_description.rgb_leds, Context.INITIALIZATION)}
 
         ${generateSwitches(hardware_description.switches, Context.INITIALIZATION)}
+
+        ${generateCodeInserts(hardware_description.code_inserts, Context.INITIALIZATION)}
     }
 
     void ProcessAnalogControls()
@@ -482,16 +512,39 @@ typedef struct {
         ${generateSwitches(hardware_description.switches, Context.PROCESSING)}
     }
 
+    void ProcessCustomControls()
+    {
+        ${generateCodeInserts(hardware_description.code_inserts, Context.PROCESSING)}
+    }
+
     inline void ProcessAllControls()
     {
         ProcessAnalogControls();
         ProcessDigitalControls();
+        ProcessCustomControls();
     }
 
     void UpdateLeds()
     {
-      ${generateLeds(hardware_description.leds, Context.PROCESSING)}
-      ${generateRgbLeds(hardware_description.rgb_leds, Context.PROCESSING)}
+        ${generateLeds(hardware_description.leds, Context.PROCESSING)}
+        ${generateRgbLeds(hardware_description.rgb_leds, Context.PROCESSING)}
+    }
+
+    void UpdateCvOutputs() 
+    {
+      ${generateCvOutputs(hardware_description.cv_outputs, Context.UPDATING)}
+    }
+
+    void UpdateCustom()
+    {
+      ${generateCodeInserts(hardware_description.code_inserts, Context.UPDATING)}
+    }
+
+    inline void UpdateAll()
+    {
+        UpdateLeds();
+        UpdateCvOutputs();
+        UpdateCustom();
     }
 
   } Daisy;
