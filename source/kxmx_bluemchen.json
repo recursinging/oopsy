@@ -1,87 +1,160 @@
 {
-    "max_apps":8,
-	  "defines": {
-      "OOPSY_TARGET_CUSTOM": 1,
-      "OOPSY_IO_COUNT": 2,
-      "OOPSY_TARGET_HAS_MIDI_INPUT": 1,
-      "OOPSY_TARGET_USES_SDMMC": 1,
-
-      "OOPSY_ANALOG_CONTROL_COUNT": 4,
-      "PIN_CONTROL_1": 16,
-      "PIN_CONTROL_2": 15,
-      "PIN_CONTROL_3": 21,
-      "PIN_CONTROL_4": 18,
-
-      "OOPSY_HAS_ENCODER": 1,
-      "PIN_ENC_CLICK": 28,
-      "PIN_ENC_B": 26,
-      "PIN_ENC_A": 27,
-
-      "OOPSY_TARGET_HAS_OLED": 1,
-      "OLED_WIDTH": 64,
-      "OLED_HEIGHT": 32,
-      "OOPSY_HAS_PARAM_VIEW": 1
+  "max_apps": 8,
+  "defines": {
+    "OOPSY_TARGET_CUSTOM": 1,
+    "OOPSY_IO_COUNT": 2,
+    "OOPSY_TARGET_HAS_MIDI_INPUT": 1,
+    "OOPSY_TARGET_USES_SDMMC": 1,
+    "OOPSY_TARGET_HAS_OLED": 1,
+    "OLED_WIDTH": 64,
+    "OLED_HEIGHT": 32,
+    "OOPSY_HAS_PARAM_VIEW": 1
+  },
+  "inserts": {
+    "main": [],
+    "audio": []
+  },
+  "labels": {
+    "params": {
+      "kn1": "kn1",
+      "kn2": "kn2",
+      "cv1": "cv1",
+      "cv2": "cv2"
     },
-    "inserts": {
-      "main": [
-        "daisy::DaisySeed seed = oopsy::daisy.hardware.seed;",
-        "// ADC initialization...",
-        "daisy::AdcChannelConfig cfg[4];",
-        "cfg[0].InitSingle(seed.GetPin(PIN_CONTROL_1));",
-        "cfg[1].InitSingle(seed.GetPin(PIN_CONTROL_2));",
-        "cfg[2].InitSingle(seed.GetPin(PIN_CONTROL_3));",
-        "cfg[3].InitSingle(seed.GetPin(PIN_CONTROL_4));",
-        "seed.adc.Init(cfg, 4);",
-        "// Control initialization...",
-        "oopsy::daisy.hardware.controls[0].Init(seed.adc.GetPtr(0), seed.AudioCallbackRate(), false);",
-        "oopsy::daisy.hardware.controls[1].Init(seed.adc.GetPtr(1), seed.AudioCallbackRate(), false);",
-        "oopsy::daisy.hardware.controls[2].Init(seed.adc.GetPtr(2), seed.AudioCallbackRate(), true);",
-        "oopsy::daisy.hardware.controls[3].Init(seed.adc.GetPtr(3), seed.AudioCallbackRate(), true);",
-        "// Encoder initialization...",
-        "oopsy::daisy.hardware.encoder.Init(seed.GetPin(PIN_ENC_A), seed.GetPin(PIN_ENC_B), seed.GetPin(PIN_ENC_CLICK), seed.AudioCallbackRate());",
-        "oopsy::daisy.hardware.display.Init(NULL);"
-      ],
-      "audio": [
-        "daisy.hardware.encoder.Debounce();"
-      ]
+    "outs": {},
+    "datas": {}
+  },
+  "inputs": {
+    "kn1": {
+      "automap": true,
+      "code": "daisy.hardware.kn1.Process();"
     },
-    "labels": {
-      "params": {
-        "kn1": "kn1",
-        "kn2": "kn2",
-        "cv1": "cv1",
-        "cv2": "cv2"
-      },
-      "outs": {
-      },
-      "datas": {
-      }
+    "kn2": {
+      "automap": true,
+      "code": "daisy.hardware.kn2.Process();"
     },
-    "inputs": {
-      "kn1": {
-        "automap": true,
-        "code": "daisy.hardware.controls[0].Process();"
-      },
-      "kn2": {
-        "automap": true,
-        "code": "daisy.hardware.controls[1].Process();"
-      },
-      "cv1": {
-        "automap": true,
-        "code": "daisy.hardware.controls[0].Process();"
-      },
-      "cv2": {
-        "automap": true,
-        "code": "daisy.hardware.controls[1].Process();"
-      }
+    "cv1": {
+      "automap": true,
+      "code": "daisy.hardware.cv1.Process();"
     },
-    "outputs": {
-    },   
-    "datahandlers": {
-      "dsy_midi_out": {
-        "where":"main",
-        "init": "daisy.midi_nullData($<data>)",
-        "code": "daisy.midi_fromData($<data>);"
-      }
+    "cv2": {
+      "automap": true,
+      "code": "daisy.hardware.cv2.Process();"
     }
+  },
+  "outputs": {},
+  "datahandlers": {
+    "dsy_midi_out": {
+      "where": "main",
+      "init": "daisy.midi_nullData($<data>)",
+      "code": "daisy.midi_fromData($<data>);"
+    }
+  },
+  "hardware_description": {
+    "schema_version": 1,
+    "name": "kxmx_bluemchen",
+    "description": "The kxmx_bluemchen is a open source, 4HP, Eurorack module powered by the Electrosmith Daisy Seed.",
+    "analog_controls": [
+      {
+        "pin": 16,
+        "flip": false,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "knob1",
+          "kn1"
+        ]
+      },
+      {
+        "pin": 15,
+        "flip": false,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "knob2",
+          "kn2"
+        ]
+      }
+    ],
+    "cv_inputs": [
+      {
+        "pin": 21,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "cv_in1",
+          "cv1"
+        ]
+      },
+      {
+        "pin": 18,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "cv_in2",
+          "cv2"
+        ]
+      }
+    ],
+    "cv_outputs": [],
+    "encoders": [
+      {
+        "pin_a": 27,
+        "pin_b": 26,
+        "pin_switch": 28,
+        "labels": [
+          "encoder"
+        ]
+      }
+    ],
+    "switches": [],
+    "leds": [],
+    "rgb_leds": [],
+    "oled_displays": [
+      {
+        "driver": "SSD130x",
+        "dimensions": "64x32",
+        "transport": "I2c",
+        "i2c_config": {
+          "address": "0x3C",
+          "mode": "I2C_MASTER",
+          "peripheral": "I2C_1",
+          "speed": "I2C_1MHZ",
+          "pin_sda": 12,
+          "pin_scl": 11
+        },
+        "labels": [
+          "oled"
+        ]
+      }
+    ],
+    "midi_handlers": [
+      {
+        "input": "UART1",
+        "output": "NONE",
+        "labels": [
+          "midi"
+        ]
+      }
+    ],
+    "sdmmc_handlers": [
+      {
+        "speed": "FAST",
+        "width": "BITS_4",
+        "clock_powersave": false,
+        "labels": [
+          "sd"
+        ]
+      }
+    ],
+    "code_inserts": {
+      "include": [],
+      "declaration": [],
+      "initialization": [],
+      "processing": [],
+      "updating": []
+    }
+  }
 }

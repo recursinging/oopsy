@@ -37,7 +37,7 @@ const fs = require("fs"),
 	path = require("path"),
 	os = require("os"),
 	assert = require("assert"),
-	custom_hardware = require("./custom_hardware");
+	hardware_description = require("./hardware_description");
 const {exec, execSync, spawn} = require("child_process");
 
 // returns the path `str` with posix path formatting:
@@ -252,6 +252,10 @@ function run() {
 	console.log(`Target ${target} configured in path ${target_path}`)
 	assert(fs.existsSync(target_path), `couldn't find target configuration file ${target_path}`);
 	const hardware = JSON.parse(fs.readFileSync(target_path, "utf8"));
+	
+	// Ensure expected structure...
+	hardware.includes = hardware.includes || {};
+
 	// consolidate hardware definition:
 	hardware.samplerate = samplerate
 	if (hardware.defines.OOPSY_IO_COUNT == undefined) hardware.defines.OOPSY_IO_COUNT = 2
@@ -383,8 +387,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ${Object.keys(hardware.defines).map(k=>`#define ${k} ${hardware.defines[k]}`).join("\n")}
 
-
-${custom_hardware.generateCustomHardwareImpl(hardware.custom_hardware)}
+${hardware_description.generateCustomHardwareImpl(hardware.hardware_description)}
 
 ${(hardware.inserts.header || []).join("\n")}
 

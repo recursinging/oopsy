@@ -103,6 +103,8 @@ function generateCvOutputs(cv_outputs, context) {
     ];
     return code.join("\n        ");
 
+  } if (context == Context.UPDATING) {
+    // TODO - How to best do this? We have no intermediary state...
   }
 
   return "";
@@ -123,8 +125,7 @@ function generateEncoders(encoders, context) {
   if (context == Context.DECLARATION) {
     // Handle declaration code gen
     let code = [`//  encoders declaration`,
-      `Encoder encoders[${encoders.length}];`,
-      `Encoder& encoder = encoders[0];`
+      `Encoder encoders[${encoders.length}];`
     ];
     // Alias the objects with their labels
     encoders.forEach((encoder, idx) => {
@@ -404,10 +405,82 @@ function generateGateOutputs(gate_outputs, context) {
 
 
 function generateMidiHandlers(midi_handlers, context) {
+  if (!midi_handlers || !midi_handlers.length)
+    return "";
+
+  if (context == Context.DECLARATION) {
+    // Handle declaration code gen
+    let code = [
+      `// midi_handlers declaration`,
+      `MidiHandler midi_handlers[${midi_handlers.length}];`];
+    // Alias the objects with their labels
+    midi_handlers.forEach((midi_handler, idx) => {
+      if (midi_handler.labels) {
+        midi_handler.labels.forEach(label => {
+          code.push(`MidiHandler& ${label} = midi_handlers[${idx}];`);
+        })
+      }
+    });
+    return code.join("\n    ");
+
+  } else if (context == Context.INITIALIZATION) {
+    // Handle initialization code gen
+    let code = [
+      `// BEGIN - midi_handlers initialization`];
+    midi_handlers.forEach((midi_handler, idx) => {
+      code.push(`midi_handlers[${idx}].Init(MidiHandler::MidiInputMode::INPUT_MODE_${midi_handler.input}, MidiHandler::MidiOutputMode::OUTPUT_MODE_${midi_handler.output});`);
+    });
+    code.push(`// END -  midi_handlers initialization`);
+    return code.join("\n        ");
+
+  }
   return "";
 }
 
 function generateSdmmcHandlers(sdmmc_handlers, context) {
+  if (!sdmmc_handlers || !sdmmc_handlers.length)
+    return "";
+
+  // TODO, how (and when) to include fatfs.h and get USE_FATFS = 1 into the makefile?
+  if (context == Context.INCLUDE) {
+    //return "#include \"fatfs.h\"\n"
+  }
+
+  if (context == Context.DECLARATION) {
+    // Handle declaration code gen
+    // Only one handler allowed
+    let sdmmc = sdmmc_handlers[0];
+    let code = [
+      `// SDMMC declaration`,
+      `SdmmcHandler sdmmc_handlers[1];`];
+
+    // Alias the objects with their labels
+    sdmmc_handlers.forEach((sdmmc_handler, idx) => {
+      if (sdmmc_handler.labels) {
+        sdmmc_handler.labels.forEach(label => {
+          code.push(`SdmmcHandler& ${label} = sdmmc_handlers[${idx}];`);
+        })
+      }
+    });
+
+    return code.join("\n    ");
+
+  } else if (context == Context.INITIALIZATION) {
+    // Handle initialization code gen
+    // Only one handler allowed
+    let sdmmc = sdmmc_handlers[0];
+    let code = [
+      `// BEGIN SDMMC intialization`,
+      `SdmmcHandler::Config sdmmc_cfg;`,
+      `sdmmc_cfg.speed = SdmmcHandler::Speed::${sdmmc.speed};`,
+      `sdmmc_cfg.width = SdmmcHandler::BusWidth::${sdmmc.width};`,
+      `sdmmc_cfg.clock_powersave = ${sdmmc.clock_powersave};`,
+      `sdmmc_handlers[0].Init(sdmmc_cfg);`,
+      `// END SDMMC intialization`];
+    return code.join("\n        ");
+
+  }
+
   return "";
 }
 
@@ -416,15 +489,15 @@ function generateCodeInserts(code_inserts, context) {
     return "";
 
   if (context == Context.INCLUDE && code_inserts.include) {
-    return code_inserts.include.join("/n");
+    return code_inserts.include.join("\n");
   } else if (context == Context.DECLARATION && code_inserts.declaration) {
-    return code_inserts.declaration.join("/n    ");
+    return code_inserts.declaration.join("\n    ");
   } else if (context == Context.INITIALIZATION && code_inserts.initialization) {
-    return code_inserts.initialization.join("/n        ");
+    return code_inserts.initialization.join("\n        ");
   } else if (context == Context.PROCESSING && code_inserts.processing) {
-    return code_inserts.initialization.join("/n        ");
+    return code_inserts.initialization.join("\n        ");
   } else if (context == Context.UPDATING && code_inserts.updating) {
-    return code_inserts.initialization.join("/n        ");
+    return code_inserts.initialization.join("\n        ");
   }
 
   return ""
@@ -437,11 +510,16 @@ function generateCodeInserts(code_inserts, context) {
  * @param {HardwareDescription} hardware_description The hardware description object.
  */
 exports.generateCustomHardwareImpl = function (hardware_description) {
+  if (!hardware_description)
+    return "";
+
   // This is the output C++ template.
   const hardware_implementation = `
 
 #include "daisy_seed.h"
 ${generateOledDisplays(hardware_description.oled_displays, Context.INCLUDE)}
+
+${generateSdmmcHandlers(hardware_description.sdmmc_handlers, Context.INCLUDE)}
 
 ${generateCodeInserts(hardware_description.code_inserts, Context.INCLUDE)}
 
@@ -467,6 +545,8 @@ typedef struct {
     ${generateOledDisplays(hardware_description.oled_displays, Context.DECLARATION)}
     
     ${generateRgbLeds(hardware_description.rgb_leds, Context.DECLARATION)}
+
+    ${generateSdmmcHandlers(hardware_description.sdmmc_handlers, Context.DECLARATION)}
 
     ${generateSwitches(hardware_description.switches, Context.DECLARATION)}
 
@@ -494,6 +574,8 @@ typedef struct {
         ${generateOledDisplays(hardware_description.oled_displays, Context.INITIALIZATION)}
 
         ${generateRgbLeds(hardware_description.rgb_leds, Context.INITIALIZATION)}
+
+        ${generateSdmmcHandlers(hardware_description.sdmmc_handlers, Context.INITIALIZATION)}
 
         ${generateSwitches(hardware_description.switches, Context.INITIALIZATION)}
 
