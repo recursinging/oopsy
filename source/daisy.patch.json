@@ -1,149 +1,13 @@
 {
-  "custom_hardware": {
-    "schema_version": 1,
-    "analog_controls": [
-      {
-        "pin": 1,
-        "labels": [
-          "knob1"
-        ]
-      },
-      {
-        "pin": 2,
-        "labels": [
-          "knob2"
-        ]
-      }
-    ],
-    "cv_inputs": [
-      {
-        "voltage_range": {
-          "min": -5,
-          "max": 5
-        },
-        "pin": 3,
-        "bipolar": true,
-        "calibration": [
-          {
-            "voltage": -5,
-            "offset": 0.012
-          },
-          {
-            "voltage": -2.5,
-            "offset": 0.021
-          },
-          {
-            "voltage": 0,
-            "offset": -1.005
-          },
-          {
-            "voltage": 2.5,
-            "offset": -0.014
-          },
-          {
-            "voltage": 5,
-            "offset": -3.087
-          }
-        ],
-        "labels": [
-          "cv1"
-        ]
-      }
-    ],
-    "cv_outputs": [],
-    "encoders": [
-      {
-        "pin_a": 5,
-        "pin_b": 6,
-        "pin_switch": 7,
-        "labels": [
-          "encoder"
-        ]
-      }
-    ],
-    "switches": [
-      {
-        "type": "TYPE_TOGGLE",
-        "polarity": "POLARITY_NORMAL",
-        "pull": "PULL_NONE",
-        "pin": 4,
-        "labels": [
-          "switch1",
-          "sw1"
-        ]
-      }
-    ],
-    "leds": [
-      {
-        "pin": 9,
-        "labels": [
-          "led1"
-        ]
-      }
-    ],
-    "rgb_leds": [
-      {
-        "pin_r": 9,
-        "pin_g": 2,
-        "pin_b": 6,
-        "labels": [
-          "rgbled1"
-        ]
-      }
-    ],
-    "oled_displays": [
-      {
-        "driver": "SSD130x",
-        "dimensions": "64x32",
-        "transport": "I2C",
-        "i2c_config": {
-          "mode": "I2C_MASTER",
-          "peripheral": "I2C_1",
-          "speed": "I2C_400KHZ",
-          "pin_sda": 12,
-          "pin_scl": 13
-        },
-        "labels": [
-          "display"
-        ]
-      }
-    ],
-    "gate_inputs": [
-      {
-        "pin": 20,
-        "labels": [
-          "gate_in1"
-        ]
-      },
-      {
-        "pin": 19,
-        "labels": [
-          "gate_in1"
-        ]
-      }
-    ],
-    "name": "Foo",
-    "description": "Bar"
-  },
   "max_apps": 8,
   "defines": {
-    "OOPSY_TARGET_PATCH": 1,
     "OOPSY_TARGET_HAS_OLED": 1,
     "OOPSY_IO_COUNT": 4,
     "OOPSY_TARGET_HAS_MIDI_INPUT": 1,
     "OOPSY_TARGET_HAS_MIDI_OUTPUT": 1,
     "OOPSY_HAS_ENCODER": 1
   },
-  "inserts": [
-    {
-      "where": "header",
-      "code": "#include \"daisy_patch.h\""
-    },
-    {
-      "where": "header",
-      "code": "typedef daisy::DaisyPatch Daisy;"
-    }
-  ],
+  "inserts": {},
   "labels": {
     "params": {
       "knob1": "kn1",
@@ -179,25 +43,25 @@
   "inputs": {
     "kn1": {
       "automap": true,
-      "code": "hardware.controls[0].Value();"
+      "code": "hardware.kn1.Value();"
     },
     "kn2": {
       "automap": true,
-      "code": "hardware.controls[1].Value();"
+      "code": "hardware.kn2.Value();"
     },
     "kn3": {
       "automap": true,
-      "code": "hardware.controls[2].Value();"
+      "code": "hardware.kn3.Value();"
     },
     "kn4": {
       "automap": true,
-      "code": "hardware.controls[2].Value();"
+      "code": "hardware.kn4.Value();"
     },
     "gt1": {
-      "code": "(hardware.gate_input[hardware.GATE_IN_1].State()?1.f:0.f);"
+      "code": "(hardware.gt1.State()?1.f:0.f);"
     },
     "gt2": {
-      "code": "(hardware.gate_input[hardware.GATE_IN_2].State()?1.f:0.f);"
+      "code": "(hardware.gt2.State()?1.f:0.f);"
     }
   },
   "outputs": {
@@ -219,6 +83,196 @@
       "where": "main",
       "init": "daisy.midi_nullData($<data>)",
       "code": "daisy.midi_fromData($<data>);"
+    }
+  },
+  "hardware_description": {
+    "schema_version": 1,
+    "name": "Daisy Patch",
+    "description": "Daisy Patch is a metamorphic sound environment capable of becoming an infinite variety of digital instruments.",
+    "cv_inputs": [
+      {
+        "pin": 15,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "kn",
+          "kn1",
+          "knob1",
+          "cv1",
+          "cv",
+          "ctrl",
+          "ctrl1"
+        ]
+      },
+      {
+        "pin": 16,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "kn2",
+          "knob2",
+          "cv2",
+          "ctrl2"
+        ]
+      },
+      {
+        "pin": 21,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "kn3",
+          "knob3",
+          "cv3",
+          "ctrl3"
+        ]
+      },
+      {
+        "pin": 18,
+        "flip": true,
+        "invert": false,
+        "bipolar": false,
+        "labels": [
+          "kn4",
+          "knob4",
+          "cv4",
+          "ctrl4"
+        ]
+      }
+    ],
+    "cv_outputs": [
+      {
+        "labels": [
+          "cvout1"
+        ]
+      },
+      {
+        "labels": [
+          "cvout2"
+        ]
+      }
+    ],
+    "gate_inputs": [
+      {
+        "pin": 20,
+        "labels": [
+          "gt",
+          "gt1",
+          "gate",
+          "gate1"
+        ]
+      },
+      {
+        "pin": 19,
+        "labels": [
+          "gt2",
+          "gate2"
+        ]
+      }
+    ],
+    "gate_outputs": [
+      {
+        "pin": 17,
+        "labels": [
+          "gateout1"
+        ]
+      }
+    ],
+    "encoders": [
+      {
+        "pin_a": 27,
+        "pin_b": 26,
+        "pin_switch": 28,
+        "labels": [
+          "encoder"
+        ]
+      }
+    ],
+    "switches": [],
+    "leds": [],
+    "rgb_leds": [],
+    "oled_displays": [
+      {
+        "driver": "SSD130x",
+        "dimensions": "128x64",
+        "transport": "4WireSpi",
+        "4_wire_spi_config": {
+          "pin_dc": 9,
+          "pin_reset": 30
+        }
+      }
+    ],
+    "midi_handlers": [
+      {
+        "input": "UART1",
+        "output": "UART1",
+        "labels": [
+          "midi"
+        ]
+      }
+    ],
+    "sdmmc_handlers": [
+      {
+        "speed": "FAST",
+        "width": "BITS_4",
+        "clock_powersave": false,
+        "labels": [
+          "sd"
+        ]
+      }
+    ],
+    "code_inserts": {
+      "include": [
+        "#include \"dev/codec_ak4556.h\""
+      ],
+      "declaration": [],
+      "initialization": [
+        "// Handle Seed Audio as-is and then",
+        "SaiHandle::Config sai_config[2];",
+        "// Internal Codec",
+        "sai_config[0].periph          = SaiHandle::Config::Peripheral::SAI_1;",
+        "sai_config[0].sr              = SaiHandle::Config::SampleRate::SAI_48KHZ;",
+        "sai_config[0].bit_depth       = SaiHandle::Config::BitDepth::SAI_24BIT;",
+        "sai_config[0].a_sync          = SaiHandle::Config::Sync::MASTER;",
+        "sai_config[0].b_sync          = SaiHandle::Config::Sync::SLAVE;",
+        "sai_config[0].a_dir           = SaiHandle::Config::Direction::TRANSMIT;",
+        "sai_config[0].b_dir           = SaiHandle::Config::Direction::RECEIVE;",
+        "sai_config[0].pin_config.fs   = {DSY_GPIOE, 4};",
+        "sai_config[0].pin_config.mclk = {DSY_GPIOE, 2};",
+        "sai_config[0].pin_config.sck  = {DSY_GPIOE, 5};",
+        "sai_config[0].pin_config.sa   = {DSY_GPIOE, 6};",
+        "sai_config[0].pin_config.sb   = {DSY_GPIOE, 3};",
+        "// External Codec",
+        "sai_config[1].periph          = SaiHandle::Config::Peripheral::SAI_2;",
+        "sai_config[1].sr              = SaiHandle::Config::SampleRate::SAI_48KHZ;",
+        "sai_config[1].bit_depth       = SaiHandle::Config::BitDepth::SAI_24BIT;",
+        "sai_config[1].a_sync          = SaiHandle::Config::Sync::SLAVE;",
+        "sai_config[1].b_sync          = SaiHandle::Config::Sync::MASTER;",
+        "sai_config[1].a_dir           = SaiHandle::Config::Direction::TRANSMIT;",
+        "sai_config[1].b_dir           = SaiHandle::Config::Direction::RECEIVE;",
+        "sai_config[1].pin_config.fs   = seed.GetPin(27);",
+        "sai_config[1].pin_config.mclk = seed.GetPin(24);",
+        "sai_config[1].pin_config.sck  = seed.GetPin(28);",
+        "sai_config[1].pin_config.sb   = seed.GetPin(25);",
+        "sai_config[1].pin_config.sa   = seed.GetPin(26);",
+        "SaiHandle sai_handle[2];",
+        "sai_handle[0].Init(sai_config[0]);",
+        "sai_handle[1].Init(sai_config[1]);",
+        "// Reset Pin for AK4556",
+        "// Built-in AK4556 was reset during Seed Init",
+        "dsy_gpio_pin codec_reset_pin = seed.GetPin(29);",
+        "Ak4556::Init(codec_reset_pin);",
+        "// Reinit Audio for _both_ codecs...",
+        "AudioHandle::Config audio_cfg;",
+        "audio_cfg.blocksize  = 48;",
+        "audio_cfg.samplerate = SaiHandle::Config::SampleRate::SAI_48KHZ;",
+        "audio_cfg.postgain   = 0.5f;",
+        "seed.audio_handle.Init(audio_cfg, sai_handle[0], sai_handle[1]);"
+      ],
+      "processing": [],
+      "updating": []
     }
   }
 }
